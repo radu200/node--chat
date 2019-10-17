@@ -1,0 +1,33 @@
+//Module name
+
+.hover-underline:hover{ 
+  text-decoration: underline; 
+}
+
+.border-radius-low {
+   border-radius:10px;
+}
+.border-radius-medium {
+        border-radius:20px;
+ }
+
+ .border-radius-hard {
+        border-radius:2px;
+}
+
+// .edit-profile-button{
+//   display: none;
+// }
+
+.show-edit-buttons{
+  padding: 10px 10px;
+  
+}
+
+.no-color{
+    background:none!important;
+    border:1px solid blue;
+    &:hover{
+       opacity:0.5;     
+    }
+}

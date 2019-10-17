@@ -1,0 +1,61 @@
+{{>MainNavBar}}
+
+    <div class="container">
+      <div class="card-panel">
+        <div class="row">
+          <div class="col s12 m12 l4">
+          <div class="card">
+             <div class="card-image waves-effect waves-block waves-light">
+              {{#if this.result.image}}       
+              <img  src="{{result.image}}">
+              {{else}}
+              <img  src="https://image.ibb.co/hbEMux/resort1.jpg">
+              
+              {{/if}}
+            </div>
+          </div>
+      
+        <div class="card-content">
+          <h4 class="break_text">{{result.position}}</h4>
+          <p class="text-opacity">{{result.category}}</p>
+          <p>{{result.description}}</p>
+          {{#if result.experience}}
+          <p>Experienta: <span class="font_weight_bold">{{result.experience}}</span></p>
+          {{/if}}
+          {{#if result.language}}
+          <p>Limbi: <span class="font_weight_bold"> {{result.language}}</span></p>
+          {{/if}}
+          {{#if result.employment_type}}
+          <p>Tipul de angajare: <span class="font_weight_bold">{{result.employment_type}}</span></p>
+          {{/if}}
+          {{#if result.salary}}
+          <p>Salariu: <span class="font_weight_bold">{{result.salary}}LEI </span></p>
+          {{/if}}
+          {{#if result.start_time}}
+          <p>Timpul de începere: <span class="font_weight_bold yellow-backgr ">{{result.start_time}}</span></p>
+          {{/if}}
+          <p> <i class="material-icons">place</i> <span class="font_weight_bold">{{result.city}}</span></p>
+          <div class="divider"></div>
+        </div>
+     </div>
+          <div class="col s12 m12 l8">
+                  
+        <ul class="collapsible">
+            <li>
+              <div class="collapsible-header"><span> 1</span> Aplicat</div>
+              <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+            </li>
+            <li>
+              <div class="collapsible-header"> <span>2 </span> lista scurta</div>
+              <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+            </li>
+            <li>
+              <div class="collapsible-header"><span>2</span> Respins</div>
+              <div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+            </li>
+             <li>
+              <div class="collapsible-header"><span>1</span> Expirat</div>
+              <div class="collapsible-body"><span>Lorem ips</span></div>
+            </li>
+          </ul>
+          </div>

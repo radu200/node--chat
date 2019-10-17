@@ -1,0 +1,10 @@
+@import "../materialize/sass/materialize";
+@import "./body";
+@import './modules/all_modules';
+@import "./authentication/login";
+@import "./authentication/signup";
+@import './components/main';
+@import "./job_seeker/main";
+@import "./employer/main";
+@import "./pages/main";
+@import './jobs/main'

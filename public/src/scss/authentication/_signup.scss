@@ -1,0 +1,17 @@
+.signup{
+    margin-top: 50px;
+    .signup-btn {
+        width: 100%;
+       &:hover{
+        opacity: 0.8;
+
+       }
+    }
+    
+}
+
+
+
+.g-recaptcha{
+   margin: 10px 0 10px 0;
+}

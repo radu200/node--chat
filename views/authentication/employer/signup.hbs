@@ -1,0 +1,79 @@
+{{>MainNavBar}}
+<section class="signup">
+  {{>alerts}}
+ <div class="row">
+    <div class="col s12  m12 l4 offset-l4">
+      <div class="card ">
+        <div class="card-content">
+          <h4 class="card-title center-align">Înregistrare Angajator</h4>
+          <form method="post" action="/api/signup/employer" id="signup-employer">
+            <div class="row">
+              <div class="input-field col s12">
+                <i class="material-icons prefix">email</i>
+                <input type="email" placeholder="Email" name="email" oninvalid="this.setCustomValidity('Emailul nu este valid')"
+                  oninput="setCustomValidity('')" required />
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12 m6">
+                <i class="material-icons prefix">person</i>
+                <input type="text"  placeholder="Prenumele" name="first_name" oninvalid="this.setCustomValidity('Prenumele este necesar')"
+                 oninput="setCustomValidity('')"  minlength="0" maxlength="50" title="Prenumele trebuie să aibă între 1 și 50 de caractere." required="true"
+                />
+              </div>
+                <div class="input-field col s12 m6">
+                <i class="material-icons prefix">person</i>
+                <input type="text"  placeholder="Numele de familie" name="last_name" oninvalid="this.setCustomValidity('Numele de familie este necesar')"
+                 oninput="setCustomValidity('')"  minlength="0" maxlength="50"  required="true"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <i class="material-icons prefix">lock</i>
+                <input type="password"  class="password" id="psw-employer-signup"  placeholder="Parola" name="password" oninvalid="this.setCustomValidity('Parola este necesara.Parola trebuie să aibă între 6 și 50 de caractere')" 
+                oninput="setCustomValidity('')"  minlength="6" maxlength="50"  required="true"
+                />
+                <p class="errorPassword"></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="input-field col s12">
+                <i class="material-icons prefix">lock</i>
+                  <input type="password" class="password" id="confirm-psw-employer"  placeholder="Parola" name="confirm_password" oninvalid="this.setCustomValidity('Confirmati parola .Parola trebuie să aibă între 6 și 50 de caractere')" 
+                oninput="setCustomValidity('')"  minlength="6" maxlength="50"  required="true"/>
+              </div>
+              <p class="center"id="cmd-employer"></p>
+            </div>
+            <div class="row">
+              <h4 class="card-title center-align">Alege Locatia curenta</h4>
+              <div class="input-field  col s12 ">
+                <i class="material-icons prefix">place</i>
+                  <select name="city" >
+                    {{>locations}}
+                  </select>
+                </div>
+              </div>
+            <p>
+              <label>
+                <input type="checkbox" name="terms_conditions" value="agreed" checked="agreed" oninvalid="this.setCustomValidity('Va rog accepta-ti terminii si conditiile saitului')" oninput="setCustomValidity('')" required="true"/>
+                <span>Am facut cunostinta si sunt deacord cu <a href="#" class="hover-underline">termenii și condițiile
+                    site-ului</a></span>
+              </label>
+            </p>
+            <p class="captchError error"></p>
+            <div class="g-recaptcha" data-sitekey="{{RECAPTCHA_SITE_KEY}}"></div>
+            <div class="row">
+              <button class="btn  signup-btn btn-large waves-effect waves-light " type="submit" name="action">CONTINUA
+              </button>
+            </div>
+          </form>
+          <p>Ai deja un cont ? <a href="/api/login" class="hover-underline">INTRA</a></p>
+        </div>
+      </div>
+    </div>
+  </div> 
+</section>
+
+{{>Footer}}
+{{>FooterCopyRight}}

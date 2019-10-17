@@ -1,0 +1,143 @@
+
+.onlinebox {
+    height: 600px;
+    overflow-y: auto;
+    background-color: #454953;
+    border-radius: 10px 10px;
+    .userImage {
+        width: 50px;
+        height: 50px;
+        border: 3px solid $gray;
+    }
+}
+
+.chat-header {
+    text-align: center;
+    width: 100%;
+    padding: 15px 0 15px 0;
+    border-radius: 10px;
+    background-color: #f1f5f7;
+}
+
+.chat-user {
+    display: flex;
+    padding-bottom: 20px;
+    margin-left: 15px;
+    .about {
+        margin-left: 10px;
+        margin-top: 5px;
+        .name {
+            color: #f4f4f4;
+        }
+    }
+    .status {
+        color: $gray;
+    }
+    .online,
+    .offline,
+    .me {
+        margin-right: 3px;
+        font-size: 10px;
+    }
+    .online {
+        color: $green;
+    }
+    .offline {
+        color: $orange;
+    }
+}
+
+
+.chatbox {
+    height: 600px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-textarea{
+    height: 70px;
+    padding: 10px 143px 20px 20px;
+    margin-top:10px;
+    border: none;
+    border-radius:10px;
+    outline: none;
+    width: 100%;
+    font-size: 16px;
+    border: 1px solid grey;
+ 
+}
+
+.button-chat{
+    border-radius: 15px!important;
+    width: 100%;
+}
+.user-one {
+    justify-content: flex-start;
+    width: 70%;
+    word-break: break-all;
+    background-color: #94C2ED;
+    color: white;
+    border-radius: 7px;
+    padding: 18px 20px;
+    margin: 5px 0 10px 0px;
+    font-size: 16px;
+    margin-bottom: 30px;
+    line-height: 26px;
+}
+
+.message-data-user-one {
+    margin: 10px 0px 0px 0px;
+    .message-data-time {
+        color: lighten($gray, 8%);
+        padding-left: 6px;
+    }
+}
+
+.user-two {
+    align-self: flex-end;
+    width: 70%;
+    word-break: break-all;
+    background-color: #86BB71;
+    color: white;
+    border-radius: 7px;
+    padding: 18px 20px;
+    margin: 5px 10px 0 0px;
+    font-size: 16px;
+    margin-bottom: 30px;
+    line-height: 26px;
+}
+
+.message-data-user-two {
+    align-self: flex-end;
+    margin: 10px 10px 0px 0;
+    .message-data-time {
+        color: lighten($gray, 8%);
+        padding-left: 6px;
+    }
+}
+
+@media (max-width:992px) {
+    .onlinebox {
+        height: 200px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: flex;
+        .chat-user-list {
+            display: flex;
+            .chat-user {
+                width: 90px;
+                flex-direction: column;
+                padding: 0 5px;
+                &:hover {
+                    font-weight: bold;
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+    .chatbox {
+        height: 400px;
+        overflow-y: auto;
+    }
+}
