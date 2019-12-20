@@ -1,15 +1,8 @@
-const { db } = require(".././config/database.js");
+const { dbPromise, db } = require(".././config/database.js");
 
-module.exports.loggedIn = (req, res, next) => {
-  if (req.user) {
-    next();
-  } else {
-    res.redirect("/api/login");
-  }
-};
 
 //Login required middleware
-module.exports.ensureAuthenticated = function(req, res, next) {
+module.exports.ensureAuthenticated = function (req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   } else {
@@ -18,7 +11,7 @@ module.exports.ensureAuthenticated = function(req, res, next) {
 };
 
 /// middleware for user access controll
-module.exports.employer = function(req, res, next) {
+module.exports.employer = function (req, res, next) {
   if (req.user.type === "employer") {
     return next();
   } else {
@@ -26,7 +19,7 @@ module.exports.employer = function(req, res, next) {
   }
 };
 
-module.exports.jobSeeker = function(req, res, next) {
+module.exports.jobSeeker = function (req, res, next) {
   if (req.user.type === "jobseeker") {
     return next();
   } else {
@@ -34,29 +27,14 @@ module.exports.jobSeeker = function(req, res, next) {
   }
 };
 
-//json format
-//Login required middleware
-module.exports.ensureAuthenticatedJsonRes = function(req, res, next) {
-  if (req.isAuthenticated()) {
+module.exports.admin = function (req, res, next) {
+  if (req.user.type === "admin") {
     return next();
   } else {
-    res.json({
-      auth: "notAuthenticated"
-    });
+    res.redirect("/api/login");
   }
 };
 
-module.exports.employerJsonRes = function(req, res, next) {
-  if (req.user.type === "employer") {
-    res.json({
-      auth: "employer"
-    });
-  } else {
-    res.json({
-      auth: "notEmployer"
-    });
-  }
-};
 
 module.exports.ensureEmailChecked = (req, res, next) => {
   db.query(
@@ -77,10 +55,66 @@ module.exports.ensureEmailChecked = (req, res, next) => {
   );
 };
 
-module.exports.userAuthenticated = (req, res, next) => {
+
+
+module.exports.authRole = (req, res) => {
   if (req.isAuthenticated()) {
-    res.redirect("/api/profile");
-  } else {
-    res.redirect("/api/login");
+    res.json({
+      'role': req.user.type,
+      'auth': true
+    })
   }
-};
+}
+
+
+// job post membership check middleware for server-side rendering
+module.exports.membershipJob = async (req, res, next) => {
+
+  try {
+    const db = await dbPromise;
+    const userId = req.user.id
+    const presentDate = Date.now()
+    const [member] = await db.execute('SELECT membership_approved_date, jobs.id as jobId FROM users LEFT JOIN jobs ON users.id = jobs.employer_id WHERE users.id = ?', [userId])
+
+    const mDate = member[0].membership_approved_date
+    const jobsId = member.map(job => job.jobId)
+    const jobLen = jobsId.length
+
+    if (mDate < presentDate && jobLen > 1) {
+      req.flash("warning_msg", {
+        msg:
+          "Pentru a posta mai multe locuri de muncă, trebuie să fii membru"
+      })
+      res.redirect('/api/profile')
+    } else if (mDate > presentDate) {
+      return next()
+    }
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+//  membership check middleware for client side SPA Pages
+module.exports.membership = async (req, res, next) => {
+
+  try {
+    const db = await dbPromise;
+    const userId = req.user.id
+    const presentDate = Date.now()
+    const [member] = await db.execute('SELECT membership_approved_date FROM users WHERE users.id = ?', [userId])
+
+    const mDate = member[0].membership_approved_date
+
+    if (mDate < presentDate) {
+      res.json({member: false })
+
+    } else if (mDate > presentDate) {
+      res.json({member: true })
+    } 
+  } catch (e) {
+     res.status(500)
+  }
+}
+
+
+

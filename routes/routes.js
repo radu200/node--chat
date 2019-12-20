@@ -15,8 +15,11 @@ module.exports = function (app) {
   const accessController = require('../middleware/access_control_middleware');
   const filesController = require('../middleware/files_control_middleware');
   const searchController = require('../controllers/search/search');
+  const adminController = require('../controllers/dashboard/admin')
+  const paymentController  = require('../controllers/payment/payment')
 
-  app.get('/api/home', homeController.getHomePage)
+  
+  app.get('/api/home',accessController.ensureAuthenticated, accessController.membershipJob,homeController.getHomePage)
   app.get('/api/success', homeController.getSuccessPage)
   //authetication routes
   app.get('/api/signup/employer', signupEmployerController.getSignUpEmployer)
@@ -81,13 +84,13 @@ module.exports = function (app) {
 
   //jobs controller 
   app.get('/api/jobs', jobsController.getJobsPage)
-  app.post('/api/job-application/applicants/active/:id', accessController.ensureAuthenticatedJsonRes, accessController.employer, jobsController.JobApplicationApplicantsActive)
-  app.post('/api/job-application/applicants/rejected/:id', accessController.ensureAuthenticatedJsonRes, accessController.employer, jobsController.JobApplicationApplicantsRejected)
-  app.post('/api/job-application/applicants/shortlist/:id', accessController.ensureAuthenticatedJsonRes, accessController.employer, jobsController.JobApplicationApplicantsShortList)
+  app.post('/api/job-application/applicants/active/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.JobApplicationApplicantsActive)
+  app.post('/api/job-application/applicants/rejected/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.JobApplicationApplicantsRejected)
+  app.post('/api/job-application/applicants/shortlist/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.JobApplicationApplicantsShortList)
   app.post('/api/job-application/jobseeker', accessController.ensureAuthenticated, accessController.jobSeeker, jobsController.JobApplicationJobSeeker)
   app.post('/api/apply/job/:id', accessController.ensureAuthenticated, accessController.jobSeeker, jobsController.postApplyJobs)
-  app.get('/api/jobs/add', accessController.ensureAuthenticated, accessController.employer, accessController.ensureEmailChecked, jobsController.getAddJobs)
-  app.post('/api/jobs/add', accessController.ensureAuthenticated, accessController.employer, filesController.uploadJobImage, jobsController.postAddJobs)
+  app.get('/api/jobs/add', accessController.ensureAuthenticated, accessController.employer, accessController.ensureEmailChecked, accessController.membershipJob,jobsController.getAddJobs)
+  app.post('/api/jobs/add', accessController.ensureAuthenticated, accessController.employer, filesController.uploadJobImage,  accessController.membershipJob,jobsController.postAddJobs)
   app.get('/api/job_image/edit/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.getJobImageEdit)
   app.post('/api/job_image/edit/:id', accessController.ensureAuthenticated, accessController.employer, filesController.editJobImage, jobsController.postJobImageEdit)
   app.get('/api/job/edit/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.getEmployerJobEdit)
@@ -96,9 +99,30 @@ module.exports = function (app) {
   app.get('/api/job/details/:id', jobsController.getJobDetail)
 
   //search
-  app.get('/api/candidate-details/:id', accessController.ensureAuthenticatedJsonRes, searchController.getCandidateDetails)
   app.post('/api/search/job', searchController.searchJobs)
-  app.post('/api/candidate-search', accessController.ensureAuthenticated, searchController.searchCandidates)
+  app.get('/api/candidate-details/:id', accessController.ensureAuthenticated, accessController.employer, searchController.getCandidateDetails)
+  app.post('/api/candidate-search', accessController.ensureAuthenticated,accessController.employer, searchController.searchCandidates)
   ///contact us
   app.get('/api/contact-us', accessController.ensureAuthenticated, contactUs.getContactUs);
+
+   //dashboard
+  app.get('/api/admin/users', accessController.ensureAuthenticated,accessController.admin, adminController.getAllUsers )
+  app.get('/api/admin/check',accessController.ensureAuthenticated, accessController.admin, adminController.getCheckUsers )
+  app.post('/api/admin/check',accessController.ensureAuthenticated,accessController.admin, adminController.postCheckUsers )
+  app.get('/api/admin/black-list',accessController.ensureAuthenticated,accessController.admin,  adminController.getAllBlackListedUsers)
+  app.post('/api/admin/black-list', accessController.ensureAuthenticated,accessController.admin, adminController.postBlackListedUsers )
+  app.post('/api/admin/unblock', accessController.ensureAuthenticated, accessController.admin, adminController.unblockBlackListedUsers)
+  app.get('/api/admin/reported', accessController.ensureAuthenticated, accessController.admin, adminController.getAllReportedUsers)
+  
+  //reports
+  app.get('/api/report/:id', accessController.ensureAuthenticated, settingsController.getReportUser)
+  app.post('/api/report', accessController.ensureAuthenticated, settingsController.postReportUser)
+
+  app.get('/api/auth/me', accessController.authRole)
+  app.get('/api/membership',accessController.ensureAuthenticated, accessController.employer, accessController.membership)
+  //payment
+  app.post('/api/payment',accessController.ensureAuthenticated, accessController.employer, paymentController.postPayment )
+  
+
 }
+

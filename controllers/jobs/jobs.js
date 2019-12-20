@@ -46,7 +46,7 @@ module.exports.JobApplicationApplicantsActive = async (req, res) => {
   const job_id = req.params.id;
   const status = "active";
   const limit = 6;
-  const offset = req.body.offset;
+  const page = req.body.page;
 
   try {
     if (req.user.type === "employer") {
@@ -59,7 +59,7 @@ module.exports.JobApplicationApplicantsActive = async (req, res) => {
       let category = job[0].category;
       const jobseeker_experience = `jobseeker_experience.category AS category, jobseeker_experience.jobseeker_id AS userID, sum(jobseeker_experience.years) AS total_ex_years `;
       const user_details = `users.first_name,users.last_name,users.type, users.avatar,users.job_seeker_location,users.job_seeker_about_me,users.job_seeker_location `;
-      const sql = `SELECT ${jobseeker_experience}, ${user_details}, job_application.jobseeker_id, job_application.job_id, job_application.status FROM users LEFT JOIN jobseeker_experience ON jobseeker_experience.jobseeker_id = users.id INNER JOIN job_application ON job_application.jobseeker_id = users.id WHERE lower(category ) LIKE '%${category}%' AND job_application.job_id = ?  AND job_application.status = ?  GROUP BY category,userID LIMIT ${limit} OFFSET ${offset}`;
+      const sql = `SELECT ${jobseeker_experience}, ${user_details}, job_application.jobseeker_id, job_application.job_id, job_application.status FROM users LEFT JOIN jobseeker_experience ON jobseeker_experience.jobseeker_id = users.id INNER JOIN job_application ON job_application.jobseeker_id = users.id WHERE lower(category ) LIKE '%${category}%' AND job_application.job_id = ?  AND job_application.status = ?  GROUP BY category,userID LIMIT ${limit} OFFSET ${page}`;
 
       const [results] = await db.query(sql, [job_id, status]);
 
@@ -77,7 +77,7 @@ module.exports.JobApplicationApplicantsRejected = async (req, res) => {
   const job_id = req.params.id;
   const status = "rejected";
   const limit = 6;
-  const offset = req.body.offset;
+  const page = req.body.page;
 
   try {
     if (req.user.type === "employer") {
@@ -90,7 +90,7 @@ module.exports.JobApplicationApplicantsRejected = async (req, res) => {
 
       const jobseeker_experience = `jobseeker_experience.category AS category, jobseeker_experience.jobseeker_id AS userID, sum(jobseeker_experience.years) AS total_ex_years `;
       const user_details = `users.first_name,users.last_name,users.type, users.avatar,users.job_seeker_location,users.job_seeker_about_me,users.job_seeker_location `;
-      const sql = `SELECT ${jobseeker_experience}, ${user_details}, job_application.jobseeker_id, job_application.job_id, job_application.status FROM users LEFT JOIN jobseeker_experience ON jobseeker_experience.jobseeker_id = users.id INNER JOIN job_application ON job_application.jobseeker_id = users.id WHERE lower(category ) LIKE '%${category}%' AND job_application.job_id = ?  AND job_application.status = ?  GROUP BY category,userID LIMIT ${limit} OFFSET ${offset}`;
+      const sql = `SELECT ${jobseeker_experience}, ${user_details}, job_application.jobseeker_id, job_application.job_id, job_application.status FROM users LEFT JOIN jobseeker_experience ON jobseeker_experience.jobseeker_id = users.id INNER JOIN job_application ON job_application.jobseeker_id = users.id WHERE lower(category ) LIKE '%${category}%' AND job_application.job_id = ?  AND job_application.status = ?  GROUP BY category,userID LIMIT ${limit} OFFSET ${page}`;
 
       const [results] = await db.query(sql, [job_id, status]);
 
@@ -108,10 +108,9 @@ module.exports.JobApplicationApplicantsShortList = async (req, res) => {
   const job_id = req.params.id;
   const status = "shortlist";
   const limit = 6;
-  const offset = req.body.offset;
+  const page = req.body.page;
 
   try {
-    if (req.user.type === "employer") {
       const db = await dbPromise;
       const [job] = await db.execute(
         "SELECT category FROM jobs  WHERE jobs.id = ?",
@@ -121,7 +120,7 @@ module.exports.JobApplicationApplicantsShortList = async (req, res) => {
 
       const jobseeker_experience = `jobseeker_experience.category AS category, jobseeker_experience.jobseeker_id AS userID, sum(jobseeker_experience.years) AS total_ex_years `;
       const user_details = `users.first_name,users.last_name,users.type, users.avatar,users.job_seeker_location,users.job_seeker_about_me,users.job_seeker_location `;
-      const sql = `SELECT ${jobseeker_experience}, ${user_details}, job_application.jobseeker_id, job_application.job_id, job_application.status FROM users LEFT JOIN jobseeker_experience ON jobseeker_experience.jobseeker_id = users.id INNER JOIN job_application ON job_application.jobseeker_id = users.id WHERE lower(category ) LIKE '%${category}%' AND job_application.job_id = ?  AND job_application.status = ?  GROUP BY category,userID LIMIT ${limit} OFFSET ${offset}`;
+      const sql = `SELECT ${jobseeker_experience}, ${user_details}, job_application.jobseeker_id, job_application.job_id, job_application.status FROM users LEFT JOIN jobseeker_experience ON jobseeker_experience.jobseeker_id = users.id INNER JOIN job_application ON job_application.jobseeker_id = users.id WHERE lower(category ) LIKE '%${category}%' AND job_application.job_id = ?  AND job_application.status = ?  GROUP BY category,userID LIMIT ${limit} OFFSET ${page}`;
 
       const [results] = await db.query(sql, [job_id, status]);
 
@@ -129,7 +128,7 @@ module.exports.JobApplicationApplicantsShortList = async (req, res) => {
         applicants: results,
         auth: "employer"
       });
-    }
+    
   } catch (err) {
     console.log(err);
   }
@@ -138,60 +137,74 @@ module.exports.JobApplicationApplicantsShortList = async (req, res) => {
 //list of jobs that jobseeker applied, appear on jobseeker profile
 module.exports.JobApplicationJobSeeker = async (req, res) => {
   const userType = req.user.type;
-  const offset = req.body.offset;
+  const page = req.body.page;
   const limit = 12;
 
   try {
     const db = await dbPromise;
 
     const [results] = await db.execute(
-      `select job_application.id as appliedJobsId, job_application.job_id, job_application.jobseeker_id ,jobs.id, jobs.category,jobs.position,jobs.image,jobs.employment_type,jobs.city from  job_application LEFT JOIN jobs on job_application.job_id = jobs.id where job_application.jobseeker_id = ? LIMIT ${limit} OFFSET ${offset} `,
+      `select job_application.id as appliedJobsId, job_application.job_id, job_application.jobseeker_id ,jobs.id, jobs.category,jobs.position,jobs.image,jobs.employment_type,jobs.city from  job_application LEFT JOIN jobs on job_application.job_id = jobs.id where job_application.jobseeker_id = ? LIMIT ${limit} OFFSET ${page} `,
       [req.user.id]
     );
 
-    if (userType === "jobseeker") {
       res.json({
         jobs: results,
         auth: "jobseeker"
       });
-    }
   } catch (err) {
     console.log(err);
   }
 };
 
 module.exports.getJobsPage = async (req, res, next) => {
-  const offset = req.query.offset;
-  const limit = 12;
+  
+  // const page = req.body.page;
+  const page = parseInt(req.query.page)
+  const limit = 6;
+  const startIndex = (page - 1) * limit
+  const endIndex = page * limit
+  const results = {}
 
-  try {
+ 
+    try {
     const db = await dbPromise;
-    const [jobs] = await db.execute(
-      `SELECT * FROM jobs LIMIT ${limit} OFFSET ${offset} `
-    );
+    const [rows ] = await db.execute("select count(*) total from jobs")
+    const totalJobs = rows[0].total
+    results.total = {
+      jobs:totalJobs,
+      limit: limit
 
-    if (req.isAuthenticated()) {
-      const userType = req.user.type;
-
-      if (userType === "jobseeker") {
-        res.json({
-          jobs: jobs,
-          auth: "jobseeker"
-        });
-      } else if (userType === "employer") {
-        res.json({
-          jobs: jobs,
-          auth: "employer"
-        });
-      }
-    } else {
-      res.json({
-        jobs: jobs,
-        auth: "notAuth"
-      });
     }
+    results.current = {
+      page:page,
+      limit: limit
+
+    }
+    if (endIndex  < totalJobs) {
+    results.next = {
+      page: page + 1,
+      limit: limit
+    }
+  }
+
+  
+  if (startIndex > 0 ) {
+    results.previous = {
+      page: page - 1,
+      limit: limit
+    }
+  } else if(startIndex < 0 ){
+    return res.status(404).json("Page Not Found")
+  }
+
+  const textSqlJobs = `SELECT * from jobs where blacklist = ? LIMIT ${limit} OFFSET ${startIndex} `
+  const [jobs] = await db.execute(textSqlJobs, [false]);
+ 
+  results.jobs =  jobs
+  res.json(results);
   } catch (err) {
-    console.log(err);
+    res.status(500).json(err)
   }
 };
 
@@ -319,7 +332,7 @@ module.exports.getJobImageEdit = async (req, res, next) => {
 module.exports.postJobImageEdit = async (req, res, next) => {
   try {
     let image;
-    let id = req.params.id;
+    let id = req.params.id;JO
 
     const db = await dbPromise;
     const [userDetails] = await db.execute(
@@ -528,11 +541,6 @@ module.exports.getJobDetail = async (req, res, next) => {
       result: userDetails[0]
     });
   } catch (err) {
-    console.log("getJobDetail", err);
-
-    req.flash("error_msg", {
-      msg: msg.error
-    });
-    res.redirect(urlPaths.back);
+    req.json(500).json(err)
   }
 };
