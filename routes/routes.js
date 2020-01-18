@@ -77,18 +77,14 @@ module.exports = function (app) {
   app.post('/api/jobseeker/experience/edit/:id', accessController.ensureAuthenticated, accessController.jobSeeker, JobSeekerProfileController.postJobSeekerEditExperience)
   app.delete('/api/jobseeker/experience/delete/:id', accessController.ensureAuthenticated, accessController.jobSeeker, JobSeekerProfileController.deleteJobSeekerExperience)
 
-  //chat 
-  app.get('/api/chat', accessController.ensureAuthenticated, chatController.getChat)
-  app.get('/api/room/:name', accessController.ensureAuthenticated, chatController.getRoom)
-  app.post('/api/room', accessController.ensureAuthenticated, chatController.postRoom)
+
 
   //jobs controller 
-  app.get('/api/jobs', jobsController.getJobsPage)
-  app.post('/api/job-application/applicants/active/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.JobApplicationApplicantsActive)
-  app.post('/api/job-application/applicants/rejected/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.JobApplicationApplicantsRejected)
-  app.post('/api/job-application/applicants/shortlist/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.JobApplicationApplicantsShortList)
+  app.get('/api/job-applicants',accessController.ensureAuthenticated, accessController.employer, jobsController.jobApplicants)
+  app.post('/api/applicants/status', jobsController.jobApplicantsStatus)
   app.post('/api/job-application/jobseeker', accessController.ensureAuthenticated, accessController.jobSeeker, jobsController.JobApplicationJobSeeker)
-  app.post('/api/apply/job/:id', accessController.ensureAuthenticated, accessController.jobSeeker, jobsController.postApplyJobs)
+  app.get('/api/job/applied', jobsController.checkAppliedJobs)
+  app.post('/api/apply/job', accessController.ensureAuthenticated, accessController.jobSeeker, jobsController.postApplyJobs)
   app.get('/api/jobs/add', accessController.ensureAuthenticated, accessController.employer, accessController.ensureEmailChecked, accessController.membershipJob,jobsController.getAddJobs)
   app.post('/api/jobs/add', accessController.ensureAuthenticated, accessController.employer, filesController.uploadJobImage,  accessController.membershipJob,jobsController.postAddJobs)
   app.get('/api/job_image/edit/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.getJobImageEdit)
@@ -96,12 +92,11 @@ module.exports = function (app) {
   app.get('/api/job/edit/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.getEmployerJobEdit)
   app.post('/api/job/edit/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.postEmployerJobEdit)
   app.delete('/api/job/delete/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.deleteJob)
-  app.get('/api/job/details/:id', jobsController.getJobDetail)
 
   //search
   app.post('/api/search/job', searchController.searchJobs)
-  app.get('/api/candidate-details/:id', accessController.ensureAuthenticated, accessController.employer, searchController.getCandidateDetails)
-  app.post('/api/candidate-search', accessController.ensureAuthenticated,accessController.employer, searchController.searchCandidates)
+  app.get('/api/candidate-details',accessController.ensureAuthenticatedJ, accessController.employerJ, searchController.getCandidateDetails)
+  app.get('/api/candidate-search', accessController.ensureAuthenticatedJ, accessController.employerJ, searchController.searchCandidates)
   ///contact us
   app.get('/api/contact-us', accessController.ensureAuthenticated, contactUs.getContactUs);
 
@@ -121,8 +116,13 @@ module.exports = function (app) {
   app.get('/api/auth/me', accessController.authRole)
   app.get('/api/membership',accessController.ensureAuthenticated, accessController.employer, accessController.membership)
   //payment
-  app.post('/api/payment',accessController.ensureAuthenticated, accessController.employer, paymentController.postPayment )
+  app.post('/api/payment',accessController.ensureAuthenticatedJ, accessController.employerJ, paymentController.postPayment )
   
+
+  //chat 
+  app.get('/api/chat',accessController.ensureAuthenticatedJ, chatController.getRooms)
+  app.get('/api/chat/room',accessController.ensureAuthenticatedJ, chatController.getRoomDetails)
+  app.post('/api/chat/room', accessController.ensureAuthenticatedJ, chatController.createRoom)
 
 }
 

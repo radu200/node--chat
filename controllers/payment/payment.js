@@ -13,8 +13,7 @@ module.exports.postPayment = async (req,res) => {
     const source = token.id
 
     if(!email || !source){
-      status = 'failure'
-      return false
+       res.status(404).json
     }
 
     const customer = await stripe.customers.create({
@@ -39,6 +38,7 @@ module.exports.postPayment = async (req,res) => {
 
     status = "success";
   } catch (error) {
+    console.log(err)
     status = "failure";
   }
 
