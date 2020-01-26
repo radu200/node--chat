@@ -1,43 +1,38 @@
-const mysql = require("mysql2");
 
-// const db = mysql.createPool({
-//   host: process.env.DB_HOST,
-//   user: process.env.DB_USER,
-//   password: process.env.DB_PASSWORD,
-//   database: process.env.DB_NAME,
-//   waitForConnections: true,
-//   connectionLimit: 100,
-//   queueLimit: 50
-// });
+const mysql = require("mysql2/promise");
 
-const mysqlPromise = require("mysql2/promise");
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
 
-const dbPromise = mysqlPromise.createPool({
+const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   waitForConnections: true,
-  connectionLimit: 100,
+  connectionLimit: 150,
   queueLimit: 50
 });
 
-const db =  mysqlPromise.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 100,
-    queueLimit: 50
-  });
- 
-  const d = db.getConnection(err => {
-    console.log(err)
-  })
+
+const dbPromise = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 150,
+  queueLimit: 50
+});
+
+
 
 module.exports = {
+  connection,
   // db,
-  d,
   dbPromise
 };

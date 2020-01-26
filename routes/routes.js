@@ -19,7 +19,7 @@ module.exports = function (app) {
   const paymentController  = require('../controllers/payment/payment')
 
   
-  app.get('/api/home',accessController.ensureAuthenticated, accessController.membershipJob,homeController.getHomePage)
+  app.get('/api/home',accessController.ensureAuthenticated,homeController.getHomePage)
   app.get('/api/success', homeController.getSuccessPage)
   //authetication routes
   app.get('/api/signup/employer', signupEmployerController.getSignUpEmployer)
@@ -56,6 +56,7 @@ module.exports = function (app) {
   app.get('/api/profile', accessController.ensureAuthenticated, accessController.ensureEmailChecked, profileController.getProfile)
   app.get('/api/profile/avatar', accessController.ensureAuthenticated, profileController.getProfileAvatarEdit)
   app.post('/api/profile/avatar', accessController.ensureAuthenticated, filesController.avatar, profileController.postProfileAvatarEdit)
+  app.post('/api/profile/delete', accessController.ensureAuthenticated, profileController.deleteProfile)
   //employer profile
   app.get('/api/profile/edit/employer', accessController.ensureAuthenticated, accessController.ensureEmailChecked, accessController.employer, employerProfileController.getEmployerProfileInfoEdit)
   app.post('/api/profile/edit/employer', accessController.ensureAuthenticated, accessController.employer, employerProfileController.postEmployerProfileInfoEdit)
@@ -85,16 +86,16 @@ module.exports = function (app) {
   app.post('/api/job-application/jobseeker', accessController.ensureAuthenticated, accessController.jobSeeker, jobsController.JobApplicationJobSeeker)
   app.get('/api/job/applied', jobsController.checkAppliedJobs)
   app.post('/api/apply/job', accessController.ensureAuthenticated, accessController.jobSeeker, jobsController.postApplyJobs)
-  app.get('/api/jobs/add', accessController.ensureAuthenticated, accessController.employer, accessController.ensureEmailChecked, accessController.membershipJob,jobsController.getAddJobs)
+  app.get('/api/jobs/add', accessController.ensureAuthenticated, accessController.employer, accessController.membershipJob,jobsController.getAddJobs)
   app.post('/api/jobs/add', accessController.ensureAuthenticated, accessController.employer, filesController.uploadJobImage,  accessController.membershipJob,jobsController.postAddJobs)
   app.get('/api/job_image/edit/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.getJobImageEdit)
   app.post('/api/job_image/edit/:id', accessController.ensureAuthenticated, accessController.employer, filesController.editJobImage, jobsController.postJobImageEdit)
   app.get('/api/job/edit/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.getEmployerJobEdit)
   app.post('/api/job/edit/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.postEmployerJobEdit)
-  app.delete('/api/job/delete/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.deleteJob)
+  app.post('/api/job/delete/:id', accessController.ensureAuthenticated, accessController.employer, jobsController.deleteJob)
 
   //search
-  app.post('/api/search/job', searchController.searchJobs)
+  app.post('/api/search/job',  searchController.searchJobs)
   app.get('/api/candidate-details',accessController.ensureAuthenticatedJ, accessController.employerJ, searchController.getCandidateDetails)
   app.get('/api/candidate-search', accessController.ensureAuthenticatedJ, accessController.employerJ, searchController.searchCandidates)
   ///contact us
@@ -122,7 +123,7 @@ module.exports = function (app) {
   //chat 
   app.get('/api/chat',accessController.ensureAuthenticatedJ, chatController.getRooms)
   app.get('/api/chat/room',accessController.ensureAuthenticatedJ, chatController.getRoomDetails)
-  app.post('/api/chat/room', accessController.ensureAuthenticatedJ, chatController.createRoom)
-
+  app.post('/api/chat/room', accessController.ensureAuthenticatedJ, accessController.checkMembership, chatController.createRoom)
+  app.post('/api/chat/remove', accessController.ensureAuthenticated, chatController.removeRoom)
 }
 

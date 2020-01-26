@@ -2,7 +2,6 @@ const { dbPromise } = require("../../../config/database.js");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
 const recaptcha = require("../../../middleware/recaptcha");
 const send_emails = require("../../send_emails/send_emails");
 const urlPaths = require("../../utils/url-paths");
@@ -30,7 +29,7 @@ module.exports.postSignUpJobSeeker = async (req, res, next) => {
   const last_name = req.body.last_name;
   const siteRules = req.body.terms_conditions;
   const city = req.body.city;
-
+  const status = 'active'
   //validation
   req.checkBody("email", "E-mailul nu este valid").isEmail();
   req.checkBody("first_name", "Prenumele este necesar ").notEmpty();
@@ -103,13 +102,14 @@ module.exports.postSignUpJobSeeker = async (req, res, next) => {
         avatar: null,
         email_confirmation_token: token,
         terms_conditions: siteRules,
-        email_status: "unverified",
+        email_status: "verified",
         ip_adress: req.ip,
         software: req.headers["user-agent"],
         preferred_lang: req.acceptsLanguages().toString(),
         job_seeker_location: city,
         blacklist:'no',
-        checked:'no'
+        checked:'no',
+        status
       };
 
       await db.query("insert into users set ?", user);
@@ -119,23 +119,22 @@ module.exports.postSignUpJobSeeker = async (req, res, next) => {
         [token]
       );
 
-      await send_emails.checkEmailAfterSignUp(
-        req,
-        res,
-        nodemailer,
-        email,
-        token
-      );
+      // await send_emails.checkEmailAfterSignUp(
+      //   req,
+      //   res,
+      //   nodemailer,
+      //   email,
+      //   token
+      // );
 
       req.flash("warning_msg", {
         msg:
-          "Vă mulțumim pentru înregistrarea pe site-ul nostru. V-am trimis un e-mail cu detalii suplimentare pentru a vă confirma e-mailul.Daca nu gasiti emailul va rog sa va loga-ti si sa retrimite-ti."
+          "Vă mulțumim pentru înregistrarea pe site-ul nostru."
       });
 
       res.redirect(urlPaths.login);
     }
   } catch (err) {
-    console.log(err);
     req.flash("error_msg", {
       msg: msg.error
     });
