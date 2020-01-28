@@ -51,10 +51,12 @@ module.exports.getProfileAvatarEdit = async (req, res, next) => {
 };
 
 module.exports.postProfileAvatarEdit = async (req, res, next) => {
+
   try {
+    const user_id = req.user.id;
     const db = await dbPromise;
     const [userDetails] = await db.execute(
-      `select id, avatar from users where id=${req.user.id}`,
+      `select id, avatar from users where id= ?`, [user_id],
     );
 
     let avatar;
@@ -67,8 +69,8 @@ module.exports.postProfileAvatarEdit = async (req, res, next) => {
       avatar = null;
     }
 
-    await db.execute(`update users set  avatar = ? where id=${req.user.id}`, [
-      avatar,
+    await db.execute(`update users set  avatar = ? where id= ?`, [
+      avatar,user_id
     ]);
 
     if (userDetails[0].avatar !== null && userDetails[0].avatar !== avatar) {
@@ -92,7 +94,7 @@ module.exports.deleteProfile = async (req, res, next) => {
       user_id,
     ]);
     req.logOut()
-   res.status(200).json("Success")
+    res.status(200).json("Success")
   } catch (err) {
     res.redirect("back");
   }
